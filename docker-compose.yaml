@@ -1,0 +1,28 @@
+services:
+  gtw:
+    image: nginx:1.17.0
+    depends_on:
+      - locs
+    volumes:
+      - ./gtw/nginx.conf:/etc/nginx/nginx.conf
+      - ./gtw/server.crt:/etc/nginx/server.crt
+      - ./gtw/server.key:/etc/nginx/server.key
+    ports:
+      - 8080:80
+      - 8443:443
+    networks:
+      default:
+        aliases:
+          - locs.tecmilenio.com.mx
+
+  locs:
+    image: localstack/localstack:latest
+    ports:
+      - 4566:4566
+    environment:
+      - LOCALSTACK_AUTH_TOKEN=ls-REMOVEDe
+      - SERVICES=s3,kinesis,eventbridge,events,iam,lambda,cloudwatch,logs
+      - GATEWAY_LISTEN=0.0.0.0:4566
+      - LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=900
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
